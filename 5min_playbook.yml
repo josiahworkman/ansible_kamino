@@ -1,4 +1,6 @@
 ---
+# credit to: https://ryaneschinger.com/blog/securing-a-server-with-ansible/
+# Description: working with ansible to run a playbook on a remote server
 - hosts: all
 
   vars:
