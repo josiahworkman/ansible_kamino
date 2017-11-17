@@ -16,9 +16,21 @@
 
   tasks:
     - name: Install required packages
+      #loop through the vars above and install all packages
       apt: name={{ ubuntu_common_required_packages }} state=installed
 
     - name: Setup ufw
       ufw: state=enabled policy=deny
       ufw: rule=allow port={{ ubuntu_common_ssh_port }} proto=tcp
       ufw: rule=allow port={{ ubuntu_common_jss_port }} proto=tcp
+
+    - name: Disallow X11 forwarding
+      lineinfile: dest=/etc/ssh/sshd_config
+                  regexp="^ForwardX11"
+                  line="ForwardX11 yes"
+                  state=present
+      notify: Restart ssh
+
+  handlers:
+    - name: Restart ssh
+      service: name=ssh state=restarted
