@@ -1,12 +1,24 @@
 ---
 - hosts: servers
   vars:
+    #Logwatch Email
+    ubutnu_common_logwatch_email: replaceme@example.com
+    
+    #Pagakes to Install
+    ubuntu_common_required_packages:
+    - ufw
+    - fail2ban
+    - logwatch
+
+    #SSH Settings
     ubuntu_common_ssh_port: 22
+    ubuntu_common_jss_port: 8443
 
   tasks:
-    - name: Install ufw
-      apt: package=ufw state=present
+    - name: Install required packages
+      apt: name={{ ubuntu_common_required_packages }} state=installed
 
     - name: Setup ufw
       ufw: state=enabled policy=deny
       ufw: rule=allow port={{ ubuntu_common_ssh_port }} proto=tcp
+      ufw: rule=allow port={{ ubuntu_common_jss_port }} proto=tcp
