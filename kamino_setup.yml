@@ -1,0 +1,12 @@
+---
+- hosts: servers
+  vars:
+    ubuntu_common_ssh_port: 22
+
+  tasks:
+    - name: Install ufw
+      apt: package=ufw state=present
+
+    - name: Setup ufw
+      ufw: state=enabled policy=deny
+      ufw: rule=allow port={{ ubuntu_common_ssh_port }} proto=tcp
