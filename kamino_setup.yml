@@ -31,6 +31,7 @@
                   state=present
       notify: Restart ssh
 
+      #this isn't working I think it's depreciated
   handlers:
     - name: Restart ssh
       service: name=ssh state=restarted
