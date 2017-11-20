@@ -2,13 +2,14 @@
 - hosts: servers
   vars:
     #Logwatch Email
-    ubutnu_common_logwatch_email: replaceme@example.com
+    ubutnu_common_logwatch_email: example@something.edu
     
     #Pagakes to Install
     ubuntu_common_required_packages:
     - ufw
     - fail2ban
     - logwatch
+    - unattended-upgrades
 
     #SSH Settings
     ubuntu_common_ssh_port: 22
@@ -24,14 +25,22 @@
       ufw: rule=allow port={{ ubuntu_common_ssh_port }} proto=tcp
       ufw: rule=allow port={{ ubuntu_common_jss_port }} proto=tcp
 
-    - name: Disallow X11 forwarding
-      lineinfile: dest=/etc/ssh/sshd_config
-                  regexp="^ForwardX11"
-                  line="ForwardX11 yes"
-                  state=present
-      notify: Restart ssh
+      # Setup Logwatch to email daily summary
+    - name: Email Logwatch Summay Daily
+      lineinfile: 
+        path: /etc/cron.daily/00logwatch
+        regexp: '^/usr/sbin/logwatch'
+        line: '/usr/sbin/logwatch --output mail --mailto {{ ubutnu_common_logwatch_email }} --detail high'
+        state: present 
+        create: yes
 
-      #this isn't working I think it's depreciated
-  handlers:
-    - name: Restart ssh
-      service: name=ssh state=restarted
+      # Setup unattended security updates/ copues apt_periodic file in directory
+    - name: Setup unattended settings on apt
+      copy: 
+        src: apt_periodic
+        dest: /etc/apt/apt.conf.d/10periodic
+
+    - name: Setup unattended security and update channels on apt
+      copy: 
+        src: apt_periodic50
+        dest: /etc/apt/apt.conf.d/50unattended-upgrades
