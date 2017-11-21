@@ -2,7 +2,7 @@
 - hosts: servers
   vars:
     #Logwatch Email
-    ubutnu_common_logwatch_email: example@something.edu
+    ubutnu_common_logwatch_email: replaceme@something.com
     
     #Pagakes to Install
     ubuntu_common_required_packages:
@@ -44,3 +44,25 @@
       copy: 
         src: apt_periodic50
         dest: /etc/apt/apt.conf.d/50unattended-upgrades
+
+      # SSH Welcome Message
+      # Look for Banner line and uncomment it, use the /etc/issue.net banner
+    - name: Change SSH Banner
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '^#Banner'
+        line: 'Banner /etc/issue.net'
+        backrefs: yes
+      notify: Restart ssh
+
+# @TODO backup exisiting issue.net file, rename issue.old and create new blank file
+#    - name: Hide System Banner info
+#      lineinfile:
+#        dest: /etc/issue.net
+
+
+  handlers:
+    - name: Restart ssh
+      service:
+        name: ssh
+        state: restarted
